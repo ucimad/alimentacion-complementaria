@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#000000">
+<title>Alimentación complementaria</title>
+<style>
+:root{
+  --bg:#f7f5f0; --surface:#ffffff; --surface-2:#f0ede6; --ink:#1f2723; --ink-2:#55605a; --ink-3:#86908a;
+  --line:#e3dfd6; --accent:#1f6f5c; --accent-ink:#ffffff; --accent-soft:#e2efe9; --warn:#a0522d; --warn-soft:#f6e9e0;
+  --radius:14px; --shadow:0 1px 2px rgba(20,30,25,.06),0 6px 24px rgba(20,30,25,.06);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#141816; --surface:#1c211e; --surface-2:#232a26; --ink:#e9ede9; --ink-2:#aeb8b2; --ink-3:#7f8a84;
+  --line:#2d3531; --accent:#5cc2a3; --accent-ink:#0f1a16; --accent-soft:#1f3a31; --warn:#e3a07a; --warn-soft:#3a2a21;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 24px rgba(0,0,0,.25);
+}}
+:root[data-theme="dark"]{
+  --bg:#141816; --surface:#1c211e; --surface-2:#232a26; --ink:#e9ede9; --ink-2:#aeb8b2; --ink-3:#7f8a84;
+  --line:#2d3531; --accent:#5cc2a3; --accent-ink:#0f1a16; --accent-soft:#1f3a31; --warn:#e3a07a; --warn-soft:#3a2a21;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:16px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:inherit}
+button{font:inherit;color:inherit}
+.app{display:grid;grid-template-columns:320px minmax(0,1fr);min-height:100vh}
+.scrim{display:none}
+/* sidebar */
+.side{position:sticky;top:0;height:100vh;overflow:auto;border-right:1px solid var(--line);background:var(--surface);padding:20px 14px 32px}
+.brand{padding:6px 10px 14px}
+.brand small{display:block;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);font-weight:700}
+.brand strong{display:block;font-size:20px;line-height:1.2;margin-top:2px}
+.prog{margin:4px 10px 18px}
+.bar{height:6px;border-radius:99px;background:var(--surface-2);overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--accent);transition:width .3s}
+.prog span{font-size:13px;color:var(--ink-2);display:block;margin-top:6px}
+.mod{margin:14px 0 4px;padding:0 10px;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);font-weight:700}
+.nav{list-style:none;margin:0;padding:0}
+.nav a{display:grid;grid-template-columns:26px 1fr auto;gap:8px;align-items:center;padding:8px 10px;border-radius:10px;text-decoration:none;font-size:15px;color:var(--ink-2)}
+.nav a:hover{background:var(--surface-2);color:var(--ink)}
+.nav a[aria-current="page"]{background:var(--accent-soft);color:var(--ink);font-weight:600}
+.nav .n{width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-size:12px;font-weight:700;background:var(--surface-2);color:var(--ink-2)}
+.nav a.done .n{background:var(--accent);color:var(--accent-ink)}
+.nav .d{font-size:12px;color:var(--ink-3);font-variant-numeric:tabular-nums}
+/* stage + player */
+.col{min-width:0}
+.stage{padding:28px clamp(16px,4vw,48px) 0;max-width:1040px}
+.player{position:relative;background:#000;border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);aspect-ratio:16/9}
+.player video,.player iframe{width:100%;height:100%;display:block;background:#000;border:0}
+.player #yt{position:absolute;inset:0}
+.yt .player video{display:none}
+.soon{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:16px;text-align:center;color:#fff;background:#1c211e}
+.soon strong{font-size:clamp(18px,4vw,24px)}
+.soon span{font-size:14px;opacity:.75}
+.player.pending .soon{display:flex}
+.player.pending #yt{visibility:hidden}
+.nav .d.p{color:var(--accent);font-weight:600}
+.end{position:absolute;inset:0;display:none;align-items:center;justify-content:center;gap:clamp(12px,3vw,22px);padding:12px 16px;color:#fff;background:rgba(8,12,10,.92)}
+.end.on{display:flex}
+.end .txt{display:flex;flex-direction:column;align-items:flex-start;gap:4px;min-width:0}
+.end small{font-size:12px;letter-spacing:.08em;text-transform:uppercase;opacity:.75}
+.end strong{font-size:clamp(16px,3.6vw,24px);line-height:1.2}
+.end .acts{display:flex;align-items:center;gap:14px;margin-top:6px;flex-wrap:wrap}
+.ring{position:relative;flex:none;width:clamp(48px,11vw,72px);aspect-ratio:1}
+.ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.ring span{position:absolute;inset:0;display:grid;place-items:center;font-size:clamp(18px,4.5vw,26px);font-weight:700;font-variant-numeric:tabular-nums}
+.ring.stopped{display:none}
+.end .go{padding:9px 16px;border-radius:999px;border:0;background:#5cc2a3;color:#0f1a16;font-weight:700;cursor:pointer;font-size:15px}
+.end .cancel{background:none;border:0;padding:0;color:#fff;opacity:.8;text-decoration:underline;cursor:pointer;font-size:14px}
+.end .hint{font-size:12px;opacity:.7;margin-top:2px}
+.missing{display:none;padding:14px 16px;margin-top:10px;border-radius:10px;background:var(--warn-soft);color:var(--warn);font-size:14px}
+/* content */
+.main{padding:18px clamp(16px,4vw,48px) 64px;max-width:1040px;width:100%}
+.crumb{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:14px;color:var(--ink-3);margin-bottom:6px}
+.menu{display:none}
+h1{font-size:clamp(24px,3.4vw,34px);line-height:1.15;margin:0 0 8px;letter-spacing:-.01em}
+.lead{font-size:17px;color:var(--ink-2);margin:0 0 14px;max-width:62ch}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:6px 0 4px}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:9px 14px;border-radius:10px;border:1px solid var(--line);background:var(--surface);cursor:pointer;text-decoration:none;font-size:15px}
+.btn:hover{border-color:var(--ink-3)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:600}
+.btn[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--accent);color:var(--ink)}
+.cols{display:grid;grid-template-columns:1.6fr 1fr;gap:22px;margin-top:20px;align-items:start}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:18px 20px}
+.card h2{font-size:14px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-3);margin:0 0 10px}
+.points{margin:0;padding-left:20px}
+.points li{margin:0 0 10px}
+.points li::marker{color:var(--accent)}
+.moms{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.moms button{width:100%;display:grid;grid-template-columns:58px 1fr;gap:10px;text-align:left;padding:9px 10px;border-radius:10px;border:1px solid transparent;background:var(--surface-2);cursor:pointer;font-size:15px}
+.moms button:hover{border-color:var(--accent)}
+.moms b{font-variant-numeric:tabular-nums;color:var(--accent)}
+.all{margin-top:26px}
+.all h2{font-size:14px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-3);margin:0 0 4px}
+.all .nav a{font-size:15px}
+.note{margin-top:22px;font-size:14px;color:var(--ink-3);max-width:70ch}
+/* phone */
+@media (max-width:900px){
+  .app{grid-template-columns:1fr}
+  .side{position:fixed;inset:0 auto 0 0;width:min(86vw,340px);z-index:20;transform:translateX(-105%);transition:transform .25s;box-shadow:var(--shadow)}
+  .app.open .side{transform:none}
+  .app.open .scrim{display:block;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:10}
+  .stage{padding:0;max-width:none;background:#000;padding-top:env(safe-area-inset-top)}
+  .player{border-radius:0;box-shadow:none}
+  .main{padding:14px 16px 56px}
+  .menu{display:inline-flex;padding:6px 10px;font-size:14px}
+  .cols{grid-template-columns:1fr;gap:14px;margin-top:16px}
+  .card{padding:16px}
+}
+</style>
+</head>
+<body>
+<div class="app" id="app">
+  <div class="scrim" id="scrim"></div>
+  <aside class="side" aria-label="Temas del curso">
+    <div class="brand"><small>Curso</small><strong>Alimentación complementaria</strong></div>
+    <div class="prog"><div class="bar"><i id="barFill"></i></div><span id="progTxt"></span></div>
+    <nav id="nav"></nav>
+  </aside>
+  <div class="col">
+    <div class="stage">
+      <div class="player">
+        <video id="v" controls playsinline preload="metadata"></video><div id="yt"></div><div class="soon" id="soon"><strong>Video próximamente</strong><span>Mientras tanto, las notas de este tema están abajo.</span></div>
+        <div class="end" id="end" role="dialog" aria-live="polite">
+          <div class="ring" id="ring"><svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="28" fill="none" stroke="rgba(255,255,255,.25)" stroke-width="5"/><circle id="ringArc" cx="32" cy="32" r="28" fill="none" stroke="#5cc2a3" stroke-width="5" stroke-linecap="round" stroke-dasharray="175.93" stroke-dashoffset="0"/></svg><span id="ringNum">10</span></div>
+          <div class="txt">
+            <small id="endKicker">Próximo video</small>
+            <strong id="endTitle"></strong>
+            <div class="acts"><button class="go" id="endGo">Ver próximo video</button><button class="cancel" id="endCancel">Cancelar</button></div>
+            <span class="hint" id="endHint">Deslizá hacia abajo para quedarte en este tema</span>
+          </div>
+        </div>
+      </div>
+      <div class="missing" id="missing">No se encontró el archivo de video. Esta página busca los videos en la carpeta “Temas”, al lado de la carpeta “Curso”.</div>
+    </div>
+    <main class="main" id="main"></main>
+  </div>
+</div>
+<script>
+const DATA = {"modules": [{"n": 1, "title": "Cómo empezar"}, {"n": 2, "title": "Qué ofrecer y cuándo"}], "lessons": [{"yt": "g-LaBw7EHgM", "id": "1-1", "mod": 1, "modTitle": "Cómo empezar", "num": 1, "title": "Leche y primeros sólidos", "summary": "La alimentación complementaria es eso: un complemento de la leche, no un reemplazo.", "points": ["Hasta el año, los bebés siguen alimentándose al 100 % con la leche (teta o fórmula).", "Los otros alimentos se incorporan de a poquito, para que después del año, cuando la leche cubre más o menos la mitad de lo que necesitan, ya tengan varios meses de experiencia comiendo.", "Lo que comen de a poco va marcando cómo se forma la microbiota del intestino y su salud a futuro."], "moments": [{"t": 3.9, "label": "Qué significa “complementaria”"}], "src": "../Temas/01-01%20Leche%20y%20primeros%20s%C3%B3lidos.mp4", "dur": 30, "orig": "07:16"}, {"yt": "g0LTjqyJP7A", "id": "1-2", "mod": 1, "modTitle": "Cómo empezar", "num": 2, "title": "Explorar antes de comer", "summary": "Al principio no hace falta que traguen: alcanza con que miren, toquen y prueben.", "points": ["No necesitan tragar ninguna cantidad de ningún alimento. Es uno de los primeros conceptos para llevarse.", "A esta edad quieren imitar y agarrar lo que tenemos en la mano (el control remoto, una botella, una banana), sin saber todavía que es comida.", "Ya se sostienen un poco sentados, llevan las manos a la línea media y se las llevan a la boca: son las señales de que están preparados.", "Entre los 6 meses y el año (con la edad corregida, en prematuros) entienden que los alimentos son para comer. Es paulatino: a algunos les lleva más tiempo.", "La pediatra no va a preguntar cuánto comieron, sino qué se animaron a ofrecerles."], "moments": [{"t": 3.9, "label": "No necesitan tragar"}, {"t": 63.9, "label": "Entre los 6 meses y el año"}, {"t": 81.9, "label": "No importa cuánto comen"}], "src": "../Temas/01-02%20Explorar%20antes%20de%20comer.mp4", "dur": 120, "orig": "07:42"}, {"yt": "nGcNuTSfU-w", "id": "1-3", "mod": 1, "modTitle": "Cómo empezar", "num": 3, "title": "Compartir la mesa", "summary": "Comer es un evento social: los bebés vienen a la mesa familiar a mirar, imitar y explorar con las manos.", "points": ["El bebé viene a la mesa familiar a imitar. No se trata de sentarlo aparte y darle papilla rápido antes del baño o de dormir.", "Aprenden mirando cómo comemos, charlamos y compartimos. Es una buena excusa para comer con más calma y menos ultraprocesados.", "Organizarse empieza en las compras: tener verduras congeladas a mano (brócoli, coliflor) o guardar una porción del asado familiar facilita mucho.", "Comen con todos los sentidos: hay que tocar, aplastar y jugar con la comida. Se los trae a la mesa cuando tienen sus necesidades básicas satisfechas (sin hambre, sin sueño, con ganas de jugar). Si están llorando o dormidos, no es el momento.", "Comen con sus propias manos: así reciben pequeñas cantidades, hacen bien la digestión y su cuerpo tiene tiempo de reconocer cada alimento. Nada de “el avioncito” ni de obligarlos a tragar con cuchara.", "La cantidad la manejan ellos. Recién habrá que controlar cantidades más adelante con los ultraprocesados (galletitas, papas fritas), no con banana, choclo, palta o pollo.", "Si vos no estás segura, ellos tampoco: lo que te dé miedo, no lo ofrezcas todavía. Ofrecer sin juicio de valor ni expectativas (ni retos ni felicitaciones exageradas).", "Pueden estar en la sillita o en la bebesit; no hace falta que apoyen los pies para comer."], "moments": [{"t": 6.1, "label": "El bebé viene a la mesa familiar"}, {"t": 103.1, "label": "Comer con todos los sentidos"}, {"t": 155.1, "label": "Organizarse desde las compras"}, {"t": 222.1, "label": "Necesidades básicas satisfechas"}, {"t": 292.1, "label": "Comer con sus manos"}, {"t": 405.1, "label": "Prohibido el avioncito"}, {"t": 524.1, "label": "Que la comida se haga papilla en su boca (la banana con cáscara)"}, {"t": 595.1, "label": "Si vos no estás segura, ellos tampoco"}, {"t": 795.1, "label": "Sin juicio de valor ni expectativas"}, {"t": 864.1, "label": "Sillita y pies apoyados"}, {"t": 944.1, "label": "De dónde viene la papilla"}], "src": "../Temas/01-03%20Compartir%20la%20mesa.mp4", "dur": 1141, "orig": "09:40"}, {"yt": "x7KB1eKFdos", "id": "1-4", "mod": 1, "modTitle": "Cómo empezar", "num": 4, "title": "Historia de las papillas", "summary": "Por qué existen las papillas y por qué hoy se busca que mastiquen texturas.", "points": ["Las papillas surgieron como un recurso médico cuando muchos bebés no amamantados enfermaban; resultaron prácticas para los adultos y se quedaron.", "Las fórmulas infantiles se comercializan desde los años 50 (en Argentina llegaron más tarde).", "Masticar es importante: ayuda al habla, a la respiración y al sueño. A partir de los 8 meses necesitan masticar pedazos sí o sí.", "Si la familia se siente más segura con papillas, se puede empezar así, pero con textura: no todo hecho sopa crema.", "La cuchara es una herramienta difícil para ellos; la mano funciona mejor."], "moments": [{"t": 2.0, "label": "El origen de las papillas"}, {"t": 82.0, "label": "Las fórmulas infantiles"}, {"t": 184.0, "label": "A partir de los 8 meses, masticar"}, {"t": 255.0, "label": "Señales de que están listos"}], "src": "../Temas/01-04%20Historia%20de%20las%20papillas.mp4", "dur": 311, "orig": "28:39"}, {"yt": "k0lIY-n0xsY", "id": "1-5", "mod": 1, "modTitle": "Cómo empezar", "num": 5, "title": "Hierro y texturas", "summary": "Desde el primer día: vegetales, proteína animal y cereales. La carne entra temprano, desmechada.", "points": ["Necesitan alimentos ricos en hierro desde el inicio. No se retrasa la carne.", "El día que empiezan a comer se ofrece un poco de todo: vegetales, una porción de proteína animal y cereales.", "La mejor forma de dar carne es desmechada: colita de cuadril al horno con papel aluminio, estofado o pollo a la cacerola, separando las hebras con un tenedor.", "Idea: muffins con hebras de pollo, zucchini rallado y huevo, que quedan blanditos.", "Empieza el bloque de seguridad: la vía aérea (aire) y la vía digestiva (comida) se cruzan en la garganta y una sola tapa, la epiglotis, protege una u otra."], "moments": [{"t": 2.4, "label": "Alimentos ricos en hierro"}, {"t": 22.4, "label": "La carne desmechada"}, {"t": 57.4, "label": "Muffins de pollo y zucchini"}, {"t": 90.4, "label": "Seguridad: vía aérea y vía digestiva"}], "src": "../Temas/01-05%20Hierro%20y%20texturas.mp4", "dur": 296, "orig": "33:48"}, {"yt": "FQeQEYwPmes", "id": "1-6", "mod": 1, "modTitle": "Cómo empezar", "num": 6, "title": "Tos y atragantamiento", "summary": "Toser, hacer arcadas o vomitar son defensas: si hace ruido, está pasando aire.", "points": ["La tos es la primera defensa y es muy eficaz: hay que dejarlos toser.", "La arcada es otra defensa (en los bebés se activa en la parte de adelante de la lengua): les indica que el bocado es grande. A veces termina en vómito y siguen comiendo como si nada.", "Clave: si tose, llora, estornuda o hace ruido, está pasando aire. La asfixia es silenciosa: boca abierta y ningún sonido.", "Los alimentos redondos y firmes, que no se aplastan apretando con los dedos (uvas, tomates cherry, cerezas), no son seguros: se ofrecen cortados en tajadas o gajos, casi hasta el año y medio o dos.", "Una hebra de carne desmechada no tapa la vía aérea; conviene ofrecer poca cantidad por vez para que no se llenen la boca."], "moments": [{"t": 4.6, "label": "La tos como defensa"}, {"t": 52.6, "label": "El reflejo de arcada"}, {"t": 249.6, "label": "Si hace ruido, está pasando aire"}, {"t": 264.6, "label": "La asfixia es silenciosa"}, {"t": 399.6, "label": "Uvas y tomates cherry: siempre cortados"}, {"t": 454.6, "label": "Las hebras de pollo"}], "src": "../Temas/01-06%20Tos%20y%20atragantamiento.mp4", "dur": 549, "orig": "38:42"}, {"yt": "Dhb7Me1xn_M", "id": "1-7", "mod": 1, "modTitle": "Cómo empezar", "num": 7, "title": "Objetos pequeños", "summary": "La mayoría de las asfixias en chicos son por objetos, no por comida.", "points": ["El 90 % de las asfixias en pediatría ocurren por objetos: dados, tapitas, canicas, ojos de peluche, piedritas, botones.", "Regla número uno: nunca meter los dedos en la boca para sacar algo; se empuja más adentro.", "La pediatra describe cómo responder ante una obstrucción completa en bebés (golpes en la espalda, boca abajo). Recomienda hacer un curso de RCP para saber actuar.", "Pilas botón: son lo más peligroso, aun tragadas pueden perforar el intestino. Los juguetes con pilas deben tener tapa con tornillo; si no, se tiran.", "Imanes chicos (de juguetes para armar): tragados pueden pegarse entre sí dentro del intestino.", "Los frutos secos enteros (maní, almendras) pueden salir “disparados” hacia la vía aérea: no se dan enteros hasta los 3 o 4 años."], "moments": [{"t": 8.4, "label": "El 90 % es por objetos"}, {"t": 60.4, "label": "Nunca meter los dedos en la boca"}, {"t": 107.4, "label": "Qué hacer ante una obstrucción"}, {"t": 294.4, "label": "Pilas botón"}, {"t": 328.4, "label": "Imanes"}, {"t": 409.4, "label": "Frutos secos: efecto proyectil"}], "src": "../Temas/01-07%20Objetos%20peque%C3%B1os.mp4", "dur": 453, "orig": "47:46"}, {"yt": "OJm45IApAg0", "id": "1-8", "mod": 1, "modTitle": "Cómo empezar", "num": 8, "title": "Frutos secos y cierre", "summary": "Nada que por su forma, tamaño o dureza pueda aspirarse.", "points": ["Maní entero: no hasta los 3 o 4 años. Si se aspira, puede quedar en el pulmón y causar neumonías repetidas.", "Regla general: no ofrecer nada que por su forma, tamaño o dureza se pueda aspirar.", "La llamada se corta por el límite de una hora y la conversación sigue en la parte 2."], "moments": [{"t": 4.5, "label": "Maní y frutos secos enteros"}, {"t": 37.5, "label": "La regla general"}], "src": "../Temas/01-08%20Frutos%20secos%20y%20cierre.mp4", "dur": 74, "orig": "55:15"}, {"yt": "UGncZYPvuDc", "id": "2-1", "mod": 2, "modTitle": "Qué ofrecer y cuándo", "num": 1, "title": "Variedad y mesa familiar", "summary": "Hasta el año y medio o dos, ofrecer la mayor variedad posible, cocinando rico para toda la familia.", "points": ["La idea es armar una gran “biblioteca de sabores”: variedad de sabores, texturas, colores y aromas.", "Cerca de los dos años todos los chicos se ponen selectivos; cuanto más hayan probado antes, más variado queda lo que eligen.", "Cocinar con sabor: especias, ajo, pimentón, curry, incluso picante, están permitidos.", "Expectativa cero: se cocina para la familia y del plato adulto se adapta lo que los bebés puedan manejar. No hacer una comida aparte para cada uno."], "moments": [{"t": 2.4, "label": "La biblioteca de sabores"}, {"t": 59.4, "label": "Cocinar con sabor"}, {"t": 89.4, "label": "Especias y picante"}, {"t": 175.4, "label": "Adaptar el plato familiar"}], "src": "../Temas/02-01%20Variedad%20y%20mesa%20familiar.mp4", "dur": 274, "orig": "01:49"}, {"yt": "RzreX5RxrdI", "id": "2-2", "mod": 2, "modTitle": "Qué ofrecer y cuándo", "num": 2, "title": "Sal, azúcar y bebidas", "summary": "Poca sal pero no nula; azúcar, nada; fruta entera mejor que jugo.", "points": ["Sal: un poco en la cocción (el agua del arroz, de las legumbres, la masa del pan) no es problema. El exceso viene sobre todo de los ultraprocesados. Poca sal, pero no nula.", "Azúcar: la propuesta es nula, porque es innecesaria. Las infusiones (mate, té, café) se ofrecen sin azúcar.", "Miel: no antes de los 18 meses, por riesgo de botulismo.", "Dátiles: son fruta y sirven para endulzar preparaciones (budines, panqueques) en lugar de azúcar.", "Fruta entera mejor que jugo: el jugo concentra el azúcar de varias frutas y deja la fibra en la cáscara. Alternativas: licuar la fruta entera o hacer helados.", "No se agregan otros lácteos (yogur, queso) por ahora: la leche que ya toman alcanza. Se hablará después del año."], "moments": [{"t": 5.1, "label": "La sal"}, {"t": 159.1, "label": "El azúcar"}, {"t": 356.1, "label": "Azúcar en las infusiones"}, {"t": 388.1, "label": "La miel"}, {"t": 558.1, "label": "Los dátiles"}, {"t": 644.1, "label": "Fruta entera o jugo"}, {"t": 751.1, "label": "Otros lácteos"}], "src": "../Temas/02-02%20Sal%2C%20az%C3%BAcar%20y%20bebidas.mp4", "dur": 814, "orig": "06:21"}, {"yt": null, "id": "2-3", "mod": 2, "modTitle": "Qué ofrecer y cuándo", "num": 3, "title": "Consultas por alimentos", "summary": "Lácteos ocasionales y por qué cuidar la carne picada en Argentina.", "points": ["Si un día hay puré con manteca o canelones con ricota en lo de la abuela, se puede: lo que no se hace es dar yogur, queso o leche todos los días antes del año.", "Carne picada: en Argentina el ganado vacuno porta una bacteria (productora de la toxina que causa el síndrome urémico hemolítico) que queda en la superficie de la carne; al picarla queda también adentro."], "moments": [{"t": 25.5, "label": "Lácteos en situaciones sociales"}, {"t": 109.5, "label": "El problema de la carne picada"}], "src": "../Temas/02-03%20Consultas%20por%20alimentos.mp4", "dur": 245, "orig": "19:50"}, {"yt": null, "id": "2-4", "mod": 2, "modTitle": "Qué ofrecer y cuándo", "num": 4, "title": "Preparación e higiene", "summary": "Cocinar la carne entera antes de picarla, sanitizar lo que comen crudo y qué alimentos esperar.", "points": ["Carne de vaca: no darla picada (ni comprada ni picada en casa). Se cocina el corte entero, sellado, y recién después se pica o desmenuza. Esto aplica a la carne vacuna, no al cerdo ni al pollo.", "Lavarse bien las manos después de tocar carne cruda.", "Frutas y verduras que van a chupar crudas: sanitizar con 1 cucharada de lavandina apta para consumo por litro de agua, al menos media hora. El vinagre no desinfecta.", "Nada derivado de la soja en el primer año y medio: dificulta la absorción del hierro (más importante en prematuros).", "Pescados grandes (atún, caballa, pez espada, corvina): no, por el mercurio. Merluza, abadejo, trucha, salmón, langostinos y calamar, sí. Nada enlatado.", "Ideas con pescado: tiritas de 5 a 10 cm, rebozadas en huevo y coco rallado o polenta, al horno.", "Cacao: no antes del año, porque es un estimulante."], "moments": [{"t": 9.2, "label": "Carne: cocinar entera y después picar"}, {"t": 139.2, "label": "Sanitizar frutas y verduras"}, {"t": 234.2, "label": "Soja"}, {"t": 256.2, "label": "Pescados"}, {"t": 315.2, "label": "Ideas con pescado"}, {"t": 395.2, "label": "Cacao"}], "src": "../Temas/02-04%20Preparaci%C3%B3n%20e%20higiene.mp4", "dur": 442, "orig": "23:55"}, {"yt": null, "id": "2-5", "mod": 2, "modTitle": "Qué ofrecer y cuándo", "num": 5, "title": "Forma y agarre", "summary": "Cortar para que sea seguro y además se pueda agarrar.", "points": ["Todo lo redondo se corta en tajadas o gajos. Mejor un tomate grande en gajos que tomates cherry, que quedan demasiado chiquitos para agarrar.", "Hasta los 10 meses de edad corregida todavía no hacen la pinza fina con los dedos: agarran con toda la mano.", "Palta y banana resbalan: dejarles un pedacito de cáscara para que puedan agarrar y chupar.", "Otra opción: un guacamole bien picado, para untar o comer con la mano.", "Lo importante es que no les haga mal y que lo puedan agarrar: si no pueden, se frustran."], "moments": [{"t": 4.5, "label": "Lo redondo, en gajos"}, {"t": 46.5, "label": "Palta y banana con cáscara"}, {"t": 72.5, "label": "Guacamole bien picado"}, {"t": 140.5, "label": "Que lo puedan agarrar"}], "src": "../Temas/02-05%20Forma%20y%20agarre.mp4", "dur": 247, "orig": "31:13"}, {"yt": null, "id": "2-6", "mod": 2, "modTitle": "Qué ofrecer y cuándo", "num": 6, "title": "Cereales y legumbres", "summary": "Variar harinas y cereales, y cocinar bien el huevo.", "points": ["Pueden comer cereales y harinas; cuanta más variedad, mejor. Las harinas refinadas solas se parecen al azúcar refinada.", "Rotar: harina de centeno, de arroz, de garbanzos, fideos caseros, fideos de legumbres (fáciles de agarrar).", "Arroz bien aglutinado (tipo risotto o sushi) se puede agarrar y se desarma en la boca. También quinoa y cuscús.", "Panquequitos del tamaño de una cuchara sopera: un huevo, una fruta (banana, manzana, pera, dátiles) y una cucharada de alguna harina.", "Huevo: revuelto, en omelette, o duro procesado o rallado. Siempre bien cocido, nunca crudo ni pasado por agua."], "moments": [{"t": 5.2, "label": "Variedad de harinas"}, {"t": 55.2, "label": "Arroz, quinoa y cuscús"}, {"t": 93.2, "label": "Panquequitos"}, {"t": 137.2, "label": "El huevo, bien cocido"}], "src": "../Temas/02-06%20Cereales%20y%20legumbres.mp4", "dur": 196, "orig": "35:15"}, {"yt": null, "id": "2-7", "mod": 2, "modTitle": "Qué ofrecer y cuándo", "num": 7, "title": "Elegir el momento", "summary": "No hay cantidad de comidas por día: se ofrece cuando están de buen ánimo y la familia come.", "points": ["No hay una cantidad de veces por día. Cada vez que la familia se sienta a comer y ellos están de buen ánimo, exploran. También pueden acompañar mientras se cocina.", "Si llegan muy cansados (por ejemplo, a la noche), mejor no: un estímulo nuevo suma cansancio. Con sus horarios, almuerzo y merienda son buenos momentos.", "Cualquier comida sirve a cualquier hora: comida de verdad.", "En prematuros no conviene atrasar mucho el inicio. Ofrecer temprano alimentos que pueden dar alergia (frutos secos en pasta, frutos rojos, pescado, maní) mejora la tolerancia.", "Frutos secos siempre en pasta, molidos o procesados: pasta de maní con banana, pesto de nueces, harina de almendras.", "Pan: mejor de panadería o de masa madre que pan lactal. Las semillas dentro de un pan no son problema; los arándanos, aplastados o dentro de un muffin.", "No hace falta un orden (primero calabaza, después frutas, etc.): ofrecer de todo, según la temporada y lo que cocina la familia.", "Si se empieza con papilla, que tenga algo de textura: por ejemplo, bolitas de puré con pollo desmenuzado bien picado."], "moments": [{"t": 5.5, "label": "Sin cantidad de comidas por día"}, {"t": 62.5, "label": "Cuando llegan cansados"}, {"t": 158.5, "label": "Prematuros y alimentos que dan alergia"}, {"t": 192.5, "label": "Frutos secos en pasta"}, {"t": 218.5, "label": "El pan"}, {"t": 472.5, "label": "Empezar con todo"}, {"t": 574.5, "label": "Papilla con textura"}], "src": "../Temas/02-07%20Elegir%20el%20momento.mp4", "dur": 616, "orig": "38:26"}, {"yt": null, "id": "2-8", "mod": 2, "modTitle": "Qué ofrecer y cuándo", "num": 8, "title": "Ideas para servir", "summary": "Tamaños seguros, primeras preparaciones y agua en vaso.", "points": ["Bolitas de puré (por ejemplo, batata) con pollo desmenuzado: se aplastan fácil.", "Bastones de zanahoria u otros alimentos que no se desarman: finitos, de 1 cm o menos de ancho.", "Buscar en internet “BLW” más el alimento (por ejemplo, “BLW berenjena”) para ver fotos de cómo cortarlo.", "Para los primeros días con papillas: guacamole, hummus, babaganoush, puré de manzana. Evitar licuar frutas solas hasta que queden líquidas: no las pueden agarrar y dependen de nosotros.", "Agua: de la canilla, filtrada, sin hervir. No hace falta agua mineral, tampoco para la fórmula."], "moments": [{"t": 4.9, "label": "Bolitas de puré con pollo"}, {"t": 80.9, "label": "Bastones: 1 cm o menos"}, {"t": 114.9, "label": "Buscar ideas de cortes"}, {"t": 130.9, "label": "Primeros días con papillas"}, {"t": 236.9, "label": "El agua"}], "src": "../Temas/02-08%20Ideas%20para%20servir.mp4", "dur": 328, "orig": "48:37"}, {"yt": null, "id": "2-9", "mod": 2, "modTitle": "Qué ofrecer y cuándo", "num": 9, "title": "Agua, vaso y cocina", "summary": "El agua es para aprender a tomar, no para hidratar.", "points": ["Se ofrece en un vaso de boca chica (como un vasito de shot), no con tetina de mamadera. Así aprenden a tomar y después pueden pasar a una botellita.", "No necesitan tomar grandes cantidades de agua: ya están hidratados con la leche. Es un aprendizaje y para acompañar la comida."], "moments": [{"t": 19.4, "label": "Vaso de boca chica"}, {"t": 55.4, "label": "Cuánta agua"}], "src": "../Temas/02-09%20Agua%2C%20vaso%20y%20cocina.mp4", "dur": 79, "orig": "54:00"}, {"yt": null, "id": "2-10", "mod": 2, "modTitle": "Qué ofrecer y cuándo", "num": 10, "title": "Próximos pasos", "summary": "Qué grasa usar, la banana ideal y confiar en los chicos.", "points": ["Grasa de elección: aceite de oliva, sobre todo en crudo. Para cocinar también sirven manteca, manteca clarificada (ghee) o aceite de coco.", "Banana: cuanto más madura, más blanda y más dulce; la muy negra es ideal para cocinar.", "Confiar en los chicos: “van a estar bien”.", "Compartir el video con quienes les den de comer y retomar la conversación el miércoles."], "moments": [{"t": 36.9, "label": "Qué grasa usar"}, {"t": 110.9, "label": "La banana más madura"}, {"t": 236.9, "label": "Confiar en los chicos"}, {"t": 251.9, "label": "Compartir el video"}], "src": "../Temas/02-10%20Pr%C3%B3ximos%20pasos.mp4", "dur": 286, "orig": "55:17"}]};
+const L = DATA.lessons;
+const KEY = 'curso-alimentacion-vistos';
+const COUNT = 10;
+let seen = {};
+try { seen = JSON.parse(localStorage.getItem(KEY) || '{}') || {}; } catch (e) { seen = {}; }
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(seen)); } catch (e) {} };
+const fmt = s => { s = Math.round(s); const h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60), x = s % 60; return (h ? h + ':' + String(m).padStart(2, '0') : m) + ':' + String(x).padStart(2, '0'); };
+const el = (tag, attrs = {}, ...kids) => { const n = document.createElement(tag); for (const [k, v] of Object.entries(attrs)) { if (k === 'class') n.className = v; else if (k.startsWith('on')) n.addEventListener(k.slice(2), v); else n.setAttribute(k, v); } for (const c of kids.flat()) if (c != null) n.append(c.nodeType ? c : document.createTextNode(c)); return n; };
+const $ = id => document.getElementById(id);
+const v = $('v');
+let cur = null, autoplayNext = false;
+const YT_MODE = L.some(l => l.yt);
+let yt = null, ytReady = null, pendingYt = null;
+if (YT_MODE) {
+  document.documentElement.classList.add('yt');
+  ytReady = new Promise(ok => { window.onYouTubeIframeAPIReady = ok; });
+  const s = document.createElement('script'); s.src = 'https://www.youtube.com/iframe_api'; document.head.append(s);
+}
+const player = {
+  async load(l, autoplay) {
+    if (!YT_MODE) { if (v.getAttribute('src') !== l.src) { v.src = l.src; v.load(); } if (autoplay) v.play().catch(() => {}); return; }
+    document.querySelector('.player').classList.toggle('pending', !l.yt);
+    if (!l.yt) { if (yt && yt.pauseVideo) yt.pauseVideo(); return; }
+    await ytReady;
+    if (!yt) {
+      await new Promise(ok => { yt = new YT.Player('yt', { videoId: l.yt, playerVars: { playsinline: 1, rel: 0, modestbranding: 1, autoplay: autoplay ? 1 : 0 },
+        events: { onReady: ok, onStateChange: e => { const mine = cur && cur.yt && yt.getVideoData && yt.getVideoData().video_id === cur.yt; if (!mine) return; if (e.data === 1) hideEnd(); if (e.data === 0) onEnded(); } } }); });
+      return;
+    }
+    autoplay ? yt.loadVideoById(l.yt) : yt.cueVideoById(l.yt);
+  },
+  seek(t) {
+    if (!YT_MODE) { const go = () => { v.currentTime = t; v.play().catch(() => {}); }; v.readyState >= 1 ? go() : v.addEventListener('loadedmetadata', go, { once: true }); return; }
+    if (yt && yt.seekTo) { yt.seekTo(t, true); yt.playVideo(); }
+  },
+};
+
+function navList(curId) {
+  const box = el('div');
+  for (const m of DATA.modules) {
+    box.append(el('div', { class: 'mod' }, `Parte ${m.n} · ${m.title}`));
+    const ul = el('ul', { class: 'nav' });
+    for (const l of L.filter(x => x.mod === m.n)) {
+      const a = el('a', { href: '#' + l.id, class: seen[l.id] ? 'done' : '' }, el('span', { class: 'n' }, seen[l.id] ? '✓' : String(l.num)), el('span', {}, l.title), (YT_MODE && !l.yt) ? el('span', { class: 'd p' }, 'Pronto') : el('span', { class: 'd' }, fmt(l.dur)));
+      if (curId === l.id) a.setAttribute('aria-current', 'page');
+      ul.append(el('li', {}, a));
+    }
+    box.append(ul);
+  }
+  return box;
+}
+function renderNav() {
+  $('nav').replaceChildren(navList(cur && cur.id));
+  const all = document.querySelector('.all .list'); if (all) all.replaceChildren(navList(cur && cur.id));
+  const n = L.filter(l => seen[l.id]).length;
+  $('barFill').style.width = (n / L.length * 100) + '%';
+  $('progTxt').textContent = `${n} de ${L.length} temas vistos`;
+}
+
+// ───────── end card: "Ver próximo video" with a 10 s countdown; scrolling stops it
+let timer = null, endAt = 0, y0 = 0;
+function stopCountdown(reason) {
+  if (timer) { clearInterval(timer); timer = null; }
+  $('ring').classList.add('stopped');
+  $('endHint').textContent = reason || '';
+}
+function hideEnd() { stopCountdown(); $('end').classList.remove('on'); }
+function showEnd() {
+  const next = L[L.indexOf(cur) + 1];
+  $('end').classList.add('on');
+  if (!next) {
+    $('endKicker').textContent = 'Terminaste todos los temas';
+    $('endTitle').textContent = '¡Bien ahí!';
+    $('endGo').textContent = 'Volver al tema 1';
+    $('endGo').onclick = () => { hideEnd(); location.hash = '#' + L[0].id; };
+    stopCountdown(''); return;
+  }
+  $('endKicker').textContent = (YT_MODE && !next.yt) ? 'Próximo tema · video próximamente' : 'Próximo video';
+  $('endTitle').textContent = `${next.mod}.${next.num} · ${next.title}`;
+  $('endGo').textContent = 'Ver próximo video';
+  $('endGo').onclick = () => goNext();
+  $('ring').classList.remove('stopped');
+  $('endHint').textContent = 'Deslizá hacia abajo para quedarte en este tema';
+  endAt = performance.now() + COUNT * 1000; y0 = window.scrollY;
+  const tick = () => {
+    const left = Math.max(0, (endAt - performance.now()) / 1000);
+    $('ringNum').textContent = Math.ceil(left);
+    $('ringArc').setAttribute('stroke-dashoffset', (175.93 * (1 - left / COUNT)).toFixed(1));
+    if (left <= 0) goNext();
+  };
+  tick(); timer = setInterval(tick, 100);
+}
+function goNext() {
+  const next = L[L.indexOf(cur) + 1]; hideEnd();
+  if (next) { autoplayNext = true; location.hash = '#' + next.id; }
+}
+window.addEventListener('scroll', () => { if (timer && window.scrollY - y0 > 30) stopCountdown('Cuenta regresiva detenida'); }, { passive: true });
+$('endCancel').addEventListener('click', () => { stopCountdown('Cuenta regresiva detenida'); $('end').classList.remove('on'); });
+v.addEventListener('play', hideEnd);
+v.addEventListener('seeking', () => { if (v.currentTime < v.duration - .5) hideEnd(); });
+function onEnded() {
+  if (cur && !seen[cur.id]) { seen[cur.id] = 1; save(); renderNav(); syncDone(); }
+  showEnd();
+}
+v.addEventListener('ended', onEnded);
+v.addEventListener('error', () => { $('missing').style.display = 'block'; });
+v.addEventListener('loadeddata', () => { $('missing').style.display = 'none'; });
+
+let doneBtn = null;
+function syncDone() { if (doneBtn) { doneBtn.setAttribute('aria-pressed', seen[cur.id] ? 'true' : 'false'); doneBtn.textContent = seen[cur.id] ? '✓ Visto' : 'Marcar como visto'; } }
+
+function renderLesson(l) {
+  cur = l; hideEnd();
+  const i = L.indexOf(l), prev = L[i - 1], next = L[i + 1];
+  player.load(l, autoplayNext); autoplayNext = false;
+  const main = $('main'); main.replaceChildren();
+  doneBtn = el('button', { class: 'btn', onclick: () => { seen[l.id] ? delete seen[l.id] : seen[l.id] = 1; save(); renderNav(); syncDone(); } });
+  const go = t => { player.seek(t); window.scrollTo({ top: 0, behavior: 'smooth' }); };
+  main.append(
+    el('div', { class: 'crumb' }, el('span', {}, `Parte ${l.mod} · Tema ${l.num} de ${L.filter(x => x.mod === l.mod).length}`),
+      el('button', { class: 'btn menu', onclick: () => $('app').classList.add('open') }, '☰ Temas')),
+    el('h1', {}, l.title),
+    el('p', { class: 'lead' }, l.summary),
+    el('div', { class: 'row' },
+      prev ? el('a', { class: 'btn', href: '#' + prev.id }, '← Anterior') : null,
+      doneBtn,
+      next ? el('a', { class: 'btn primary', href: '#' + next.id }, 'Siguiente →') : null),
+    el('div', { class: 'cols' },
+      el('section', { class: 'card' }, el('h2', {}, 'Lo más importante'), el('ul', { class: 'points' }, l.points.map(p => el('li', {}, p)))),
+      el('section', { class: 'card' }, el('h2', {}, 'Momentos clave'), el('ul', { class: 'moms' }, l.moments.map(m => el('li', {}, el('button', { onclick: () => go(m.t), title: 'Ir a ' + fmt(m.t) }, el('b', {}, fmt(m.t)), el('span', {}, m.label))))))),
+    el('section', { class: 'all' }, el('h2', {}, 'Todos los temas'), el('div', { class: 'list' })),
+    el('p', { class: 'note' }, `En la grabación completa, este tema empieza en el minuto ${l.orig} de la parte ${l.mod}. Las notas salen de una transcripción automática y pueden tener imprecisiones: ante cualquier duda, vale lo que se dice en el video. Para indicaciones individuales y maniobras de primeros auxilios, consultá al equipo pediátrico.`));
+  syncDone(); renderNav();
+  document.title = l.title + ' · Alimentación complementaria';
+  window.scrollTo(0, 0);
+}
+
+function route() {
+  $('app').classList.remove('open');
+  const l = L.find(x => x.id === location.hash.slice(1)) || L[0];
+  renderLesson(l);
+}
+$('scrim').addEventListener('click', () => $('app').classList.remove('open'));
+window.addEventListener('hashchange', route);
+route();
+</script>
+</body>
+</html>
